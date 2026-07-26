@@ -34,7 +34,7 @@ export function ItemsModal({ opened, onClose, items, onAdd, onDelete }: ItemsMod
   const canAdd =
     form.name.trim() !== '' &&
     (form.shelfNumber.trim() !== '' || form.binNumber.trim() !== '') &&
-    form.quantity.trim() !== '';
+    form.quantity.trim() !== '' && form.unit.trim() !== '';
 
   function toggleSelected(id: number, checked: boolean) {
     setSelectedIds((prev) => {
