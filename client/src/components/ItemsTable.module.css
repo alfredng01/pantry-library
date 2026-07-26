@@ -1,0 +1,33 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+}
+
+.table th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.sortArrow {
+  margin-left: 4px;
+  opacity: 0.6;
+}
+
+.rowEmpty {
+}
+
+.rowLow {
+  background-color: light-dark(#fff9db, #4d3800);
+}
+
+.rowOut {
+  background-color: light-dark(#ffe3e3, #4d0000);
+}
