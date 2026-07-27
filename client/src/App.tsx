@@ -25,7 +25,7 @@ function App() {
             <MagnifyingGlassIcon size={16} />
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
           </Group>
-          <Group>
+          <Group gap={5}>
             <Button variant="default" onClick={() => setModalOpened(true)}>
               Add / Remove Item
             </Button>
