@@ -1,22 +1,27 @@
 import { useState } from 'react';
-import { Alert, Button, Container, Group, Loader, Stack, Title } from '@mantine/core';
+import { Alert, Button, Container, Group, Loader, Stack, Title, useMantineTheme } from '@mantine/core';
 import { SearchBar } from './components/SearchBar';
 import { ItemsTable } from './components/ItemsTable';
 import { ItemsModal } from './components/ItemsModal';
 import { useItems } from './hooks/useItems';
+import { MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr';
 
 function App() {
   const { items, loading, syncing, error, isDirty, editCell, addItem, removeItems, syncUpdates } =
     useItems();
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpened, setModalOpened] = useState(false);
+  const theme = useMantineTheme();
 
   return (
-    <Container size="lg" py="xl">
+    <Container unstyled style={{
+      backgroundColor: theme.colors.violet[1]
+    }}>
       <Stack gap="lg">
         <Title order={2}>Pantry Library</Title>
 
-        <Group justify="space-between" wrap="wrap">
+        <Group wrap="wrap">
+          <MagnifyingGlassIcon size={16} />
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
           <Group>
             <Button variant="default" onClick={() => setModalOpened(true)}>
