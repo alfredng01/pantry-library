@@ -15,14 +15,16 @@ function App() {
 
   return (
     <Container unstyled style={{
-      backgroundColor: theme.colors.violet[1]
+      backgroundColor: theme.colors.blue[0]
     }}>
       <Stack gap="lg">
         <Title order={2}>Pantry Library</Title>
 
-        <Group wrap="wrap">
-          <MagnifyingGlassIcon size={16} />
-          <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        <Group wrap="wrap" justify='space-between'>
+          <Group>
+            <MagnifyingGlassIcon size={16} />
+            <SearchBar value={searchQuery} onChange={setSearchQuery} />
+          </Group>
           <Group>
             <Button variant="default" onClick={() => setModalOpened(true)}>
               Add / Remove Item
