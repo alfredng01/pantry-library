@@ -1,7 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Group, NumberInput, Pagination, Text } from '@mantine/core';
 import type { Item, SortDirection, SortKey } from '../types';
 import { EditableCell } from './EditableCell';
 import styles from './ItemsTable.module.css';
+
+const DEFAULT_PAGE_SIZE = 20;
 
 interface ItemsTableProps {
   items: Item[];
@@ -34,6 +37,8 @@ function compareValues(a: Item, b: Item, key: SortKey): number {
 export function ItemsTable({ items, searchQuery, onEditCell }: ItemsTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   function toggleSort(key: SortKey) {
     if (key === sortKey) {
@@ -58,6 +63,21 @@ export function ItemsTable({ items, searchQuery, onEditCell }: ItemsTableProps) 
     return sorted;
   }, [items, searchQuery, sortKey, sortDirection]);
 
+  const totalPages = Math.max(1, Math.ceil(visibleItems.length / pageSize));
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, pageSize]);
+
+  useEffect(() => {
+    setPage((p) => Math.min(p, totalPages));
+  }, [totalPages]);
+
+  const pagedItems = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return visibleItems.slice(start, start + pageSize);
+  }, [visibleItems, page, pageSize]);
+
   function rowClass(item: Item): string {
     if (item.quantity === 0) return styles.rowOut;
     if (item.quantity === 1) return styles.rowLow;
@@ -65,45 +85,62 @@ export function ItemsTable({ items, searchQuery, onEditCell }: ItemsTableProps) 
   }
 
   return (
-    <table className={styles.table}>
-      <thead>
-        <tr>
-          {COLUMNS.map((col) => (
-            <th key={col.key} onClick={() => toggleSort(col.key)}>
-              {col.label}
-              {sortKey === col.key && (
-                <span className={styles.sortArrow}>{sortDirection === 'asc' ? '▲' : '▼'}</span>
-              )}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {visibleItems.map((item) => (
-          <tr key={item.id} className={rowClass(item)}>
+    <div>
+      <table className={styles.table}>
+        <thead>
+          <tr>
             {COLUMNS.map((col) => (
-              <td key={col.key}>
-                {col.editable ? (
-                  <EditableCell
-                    value={(item[col.key] ?? '') as string | number}
-                    type={col.type}
-                    onCommit={(value) => onEditCell(item.id, col.key, value)}
-                  />
-                ) : (
-                  <div>{formatUpdatedAt(item.updatedAt)}</div>
+              <th key={col.key} onClick={() => toggleSort(col.key)}>
+                {col.label}
+                {sortKey === col.key && (
+                  <span className={styles.sortArrow}>{sortDirection === 'asc' ? '▲' : '▼'}</span>
                 )}
-              </td>
+              </th>
             ))}
           </tr>
-        ))}
-        {visibleItems.length === 0 && (
-          <tr>
-            <td colSpan={COLUMNS.length} style={{ textAlign: 'center', opacity: 0.6 }}>
-              No items found.
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {pagedItems.map((item) => (
+            <tr key={item.id} className={rowClass(item)}>
+              {COLUMNS.map((col) => (
+                <td key={col.key}>
+                  {col.editable ? (
+                    <EditableCell
+                      value={(item[col.key] ?? '') as string | number}
+                      type={col.type}
+                      onCommit={(value) => onEditCell(item.id, col.key, value)}
+                    />
+                  ) : (
+                    <div>{formatUpdatedAt(item.updatedAt)}</div>
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+          {visibleItems.length === 0 && (
+            <tr>
+              <td colSpan={COLUMNS.length} style={{ textAlign: 'center', opacity: 0.6 }}>
+                No items found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+      {visibleItems.length > 0 && (
+        <Group justify="space-between" mt="md" wrap="wrap">
+          <Group gap="xs">
+            <Text size="sm">Items per page</Text>
+            <NumberInput
+              value={pageSize}
+              onChange={(value) => setPageSize(Math.max(1, Number(value) || DEFAULT_PAGE_SIZE))}
+              min={1}
+              w={80}
+            />
+          </Group>
+          <Pagination total={totalPages} value={page} onChange={setPage} />
+        </Group>
+      )}
+    </div>
   );
 }

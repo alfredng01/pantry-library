@@ -42,6 +42,7 @@ export function EditableCell({ value, type = 'text', onCommit }: EditableCellPro
       <input
         ref={inputRef}
         type={type === 'number' ? 'number' : 'text'}
+        step={type === 'number' ? 'any' : undefined}
         value={draft}
         autoFocus
         onChange={(e) => setDraft(e.target.value)}

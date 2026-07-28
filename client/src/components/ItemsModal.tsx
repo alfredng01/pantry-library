@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import {
   Button,
   Checkbox,
@@ -77,9 +78,25 @@ export function ItemsModal({ opened, onClose, items, onAdd, onDelete }: ItemsMod
     }
   }
 
+  function handleClose() {
+    // Escape, the X button, and overlay clicks all funnel through here —
+    // discard any unsaved draft (add-form input, delete selections) so
+    // reopening the modal always starts clean.
+    setForm(emptyForm);
+    setSelectedIds(new Set());
+    onClose();
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement;
+    if (e.key === 'Enter' && target.tagName !== 'BUTTON' && canAdd) {
+      handleAdd();
+    }
+  }
+
   return (
-    <Modal opened={opened} onClose={onClose} title="Manage Items" size="lg">
-      <Stack gap="md">
+    <Modal opened={opened} onClose={handleClose} title="Manage Items" size="lg">
+      <Stack gap="md" onKeyDown={handleKeyDown}>
         <div>
           <Text fw={600} mb="xs">
             Current items
