@@ -5,4 +5,4 @@ server/data/*.db-*
 .DS_Store
 *.log
 .claude
-docker-composse.unraid.yml
+docker-compose.unraid.yml
