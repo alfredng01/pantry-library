@@ -80,7 +80,7 @@ export function ItemsTable({ items, searchQuery, onEditCell }: ItemsTableProps) 
 
   function rowClass(item: Item): string {
     if (item.quantity === 0) return styles.rowOut;
-    if (item.quantity === 1) return styles.rowLow;
+    if ((item.quantity <= 1) && (item.quantity > 0)) return styles.rowLow;
     return styles.rowEmpty;
   }
 
