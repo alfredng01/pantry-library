@@ -5,6 +5,7 @@ export interface Item {
   binNumber: string | null;
   quantity: number;
   unit: string;
+  updatedAt: string;
 }
 
 export interface NewItemInput {
@@ -15,6 +16,6 @@ export interface NewItemInput {
   unit: string;
 }
 
-export type SortKey = 'name' | 'shelfNumber' | 'binNumber' | 'quantity' | 'unit';
+export type SortKey = 'name' | 'shelfNumber' | 'binNumber' | 'quantity' | 'unit' | 'updatedAt';
 
 export type SortDirection = 'asc' | 'desc';

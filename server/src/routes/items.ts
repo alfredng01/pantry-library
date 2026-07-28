@@ -11,6 +11,7 @@ interface ItemRow {
   bin_number: string | null;
   quantity: number;
   unit: string;
+  updated_at: string;
 }
 
 function rowToItem(row: ItemRow): Item {
@@ -21,6 +22,7 @@ function rowToItem(row: ItemRow): Item {
     binNumber: row.bin_number,
     quantity: row.quantity,
     unit: row.unit,
+    updatedAt: row.updated_at,
   };
 }
 
@@ -47,8 +49,8 @@ router.post('/', (req, res) => {
 
   const result = db
     .prepare(
-      `INSERT INTO items (name, shelf_number, bin_number, quantity, unit)
-       VALUES (?, ?, ?, ?, ?)`
+      `INSERT INTO items (name, shelf_number, bin_number, quantity, unit, updated_at)
+       VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
     )
     .run(
       name,
@@ -69,7 +71,17 @@ router.patch('/batch', (req, res) => {
 
   const stmt = db.prepare(`
     UPDATE items
-    SET name = ?, shelf_number = ?, bin_number = ?, quantity = ?, unit = ?
+    SET
+      name = ?,
+      shelf_number = ?,
+      bin_number = ?,
+      quantity = ?,
+      unit = ?,
+      updated_at = CASE
+        WHEN name != ? OR quantity != ? OR unit != ?
+          THEN strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+        ELSE updated_at
+      END
     WHERE id = ?
   `);
 
@@ -79,6 +91,9 @@ router.patch('/batch', (req, res) => {
         item.name,
         item.shelfNumber,
         item.binNumber,
+        item.quantity,
+        item.unit,
+        item.name,
         item.quantity,
         item.unit,
         item.id

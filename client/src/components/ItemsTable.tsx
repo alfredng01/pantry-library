@@ -9,13 +9,20 @@ interface ItemsTableProps {
   onEditCell: (id: number, field: keyof Item, value: string | number) => void;
 }
 
-const COLUMNS: { key: SortKey; label: string; type: 'text' | 'number' }[] = [
-  { key: 'name', label: 'Item Name', type: 'text' },
-  { key: 'shelfNumber', label: 'Shelf Number', type: 'text' },
-  { key: 'binNumber', label: 'Bin Number', type: 'text' },
-  { key: 'quantity', label: 'Quantity', type: 'number' },
-  { key: 'unit', label: 'Unit', type: 'text' },
+const COLUMNS: { key: SortKey; label: string; type: 'text' | 'number'; editable: boolean }[] = [
+  { key: 'name', label: 'Item Name', type: 'text', editable: true },
+  { key: 'shelfNumber', label: 'Shelf Number', type: 'text', editable: true },
+  { key: 'binNumber', label: 'Bin Number', type: 'text', editable: true },
+  { key: 'quantity', label: 'Quantity', type: 'number', editable: true },
+  { key: 'unit', label: 'Unit', type: 'text', editable: true },
+  { key: 'updatedAt', label: 'Last Updated', type: 'text', editable: false },
 ];
+
+function formatUpdatedAt(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
+}
 
 function compareValues(a: Item, b: Item, key: SortKey): number {
   const av = a[key];
@@ -76,11 +83,15 @@ export function ItemsTable({ items, searchQuery, onEditCell }: ItemsTableProps) 
           <tr key={item.id} className={rowClass(item)}>
             {COLUMNS.map((col) => (
               <td key={col.key}>
-                <EditableCell
-                  value={(item[col.key] ?? '') as string | number}
-                  type={col.type}
-                  onCommit={(value) => onEditCell(item.id, col.key, value)}
-                />
+                {col.editable ? (
+                  <EditableCell
+                    value={(item[col.key] ?? '') as string | number}
+                    type={col.type}
+                    onCommit={(value) => onEditCell(item.id, col.key, value)}
+                  />
+                ) : (
+                  <div>{formatUpdatedAt(item.updatedAt)}</div>
+                )}
               </td>
             ))}
           </tr>

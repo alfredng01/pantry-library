@@ -17,6 +17,15 @@ db.exec(`
     shelf_number TEXT,
     bin_number TEXT,
     quantity INTEGER NOT NULL DEFAULT 0,
-    unit TEXT NOT NULL DEFAULT ''
+    unit TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
   )
 `);
+
+const columns = db.prepare('PRAGMA table_info(items)').all() as { name: string }[];
+if (!columns.some((c) => c.name === 'updated_at')) {
+  // ALTER TABLE ADD COLUMN only permits a literal constant default;
+  // backfill the real timestamp in a separate statement right after.
+  db.exec(`ALTER TABLE items ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''`);
+  db.exec(`UPDATE items SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')`);
+}

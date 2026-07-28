@@ -5,6 +5,7 @@ export interface Item {
   binNumber: string | null;
   quantity: number;
   unit: string;
+  updatedAt: string;
 }
 
 export interface ItemInput {
